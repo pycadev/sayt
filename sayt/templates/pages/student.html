@@ -1,0 +1,360 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Abiturentlar uchun - HARBIY AVIATSIYA INSTITUTI{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero */
+    .hero-abiturent {
+        background: linear-gradient(rgba(33, 150, 243, 0.75), rgba(33, 150, 243, 0.4)) center/cover no-repeat;
+        min-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: white;
+        padding: 2rem;
+        position: relative;
+    }
+    .hero-abiturent h1 {
+        font-size: 4.5rem;
+        font-weight: 900;
+        text-shadow: 0 8px 30px rgba(0,0,0,0.7);
+        animation: fadeInDown 1.5s ease-out;
+    }
+    .hero-abiturent p {
+        font-size: 2rem;
+        max-width: 1000px;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        animation: fadeInUp 1.8s ease-out;
+    }
+
+    /* Timeline */
+    .timeline-section {
+        padding: 120px 0;
+    }
+    .timeline {
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 40px;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        width: 6px;
+        background: linear-gradient(to bottom, #2196f3, #64b5f6);
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 0;
+    }
+    .timeline-item {
+        position: relative;
+        margin: 80px 0;
+        display: flex;
+        align-items: center;
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all 0.8s ease-out;
+    }
+    .timeline-item.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .timeline-item.left {
+        justify-content: flex-end;
+        padding-right: 60px;
+    }
+    .timeline-item.right {
+        justify-content: flex-start;
+        padding-left: 60px;
+    }
+    .timeline-content {
+        width: 45%;
+        max-width: 500px;
+        background: white;
+        padding: 35px;
+        border-radius: 20px;
+        box-shadow: 0 10px 35px rgba(33, 150, 243, 0.15);
+        position: relative;
+        z-index: 1;
+    }
+    .timeline-icon {
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        background: #2196f3;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.8rem;
+        z-index: 2;
+        box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+    }
+    .timeline-item.left .timeline-icon {
+        right: -40px;
+    }
+    .timeline-item.right .timeline-icon {
+        left: -40px;
+    }
+    .timeline-content h3 {
+        font-size: 2.1rem;
+        color: #2196f3;
+        margin-bottom: 20px;
+    }
+    .timeline-content p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #444;
+    }
+    .timeline-content img {
+        width: 100%;
+        border-radius: 16px;
+        margin-top: 25px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    /* Accordion */
+    .imtiyoz-section {
+        padding: 100px 0;
+        background: white;
+    }
+    .accordion-item {
+        background: white;
+        border-radius: 18px;
+        margin-bottom: 25px;
+        box-shadow: 0 8px 30px rgba(33, 150, 243, 0.12);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .accordion-item:hover {
+        box-shadow: 0 12px 40px rgba(33, 150, 243, 0.2);
+    }
+    .accordion-header {
+        padding: 28px;
+        background: #e3f2fd;
+        color: #2196f3;
+        font-size: 1.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background 0.3s;
+    }
+    .accordion-header:hover {
+        background: #bbdefb;
+    }
+    .accordion-header i {
+        transition: transform 0.3s ease;
+    }
+    .accordion-header.active i {
+        transform: rotate(180deg);
+    }
+    .accordion-body {
+        padding: 30px;
+        display: none;
+        background: #f8fbff;
+        font-size: 1.15rem;
+        line-height: 1.8;
+        color: #555;
+    }
+    .accordion-body.open {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+
+    /* Kontakt */
+    .contact-section {
+        padding: 100px 0;
+        background: #f8fbff;
+    }
+    .contact-card {
+        background: white;
+        border-radius: 24px;
+        padding: 50px;
+        max-width: 800px;
+        margin: 0 auto;
+        box-shadow: 0 12px 40px rgba(33, 150, 243, 0.15);
+        text-align: center;
+    }
+    .contact-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 25px;
+        margin: 30px 0;
+        font-size: 1.3rem;
+    }
+    .contact-item i {
+        font-size: 2.5rem;
+        color: #2196f3;
+    }
+
+    /* Animatsiyalar */
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-60px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(60px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Mobil optimizatsiya */
+    @media (max-width: 992px) {
+        .hero-abiturent h1 { font-size: 3rem; }
+        .hero-abiturent p { font-size: 1.5rem; }
+        .timeline::before { left: 40px; }
+        .timeline-item { flex-direction: column; padding: 20px 0; }
+        .timeline-item.left, .timeline-item.right { justify-content: center; padding-left: 80px; padding-right: 20px; }
+        .timeline-content { width: 100%; text-align: left; }
+        .timeline-item.left .timeline-icon, .timeline-item.right .timeline-icon { left: 0; right: auto; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero-abiturent">
+    <h1>O‘zbekiston Respublikasi Harbiy xavfsizlik va mudofaa universitetining Harbiy aviatsiya institutiga qabul bosqichlari</h1>
+    <p>(vatan qudratini qanotlarimizda ko‘taramiz)</p>
+</section>
+
+<!-- Timeline – Bosqichlar -->
+<section class="timeline-section">
+    <div class="container">
+        <h2 class="text-5xl font-bold text-center mb-24 text-blue-800">Qabul tartibi bosqichma-bosqich</h2>
+        <div class="timeline">
+            <div class="timeline-item left">
+                <div class="timeline-icon"><i class="bi bi-file-earmark-text-fill"></i></div>
+                <div class="timeline-content">
+                    <h3>1. Ariza berish</h3>
+                    <p>1 fevral – 1 aprel oralig‘ida yashash joyingizdagi mudofaa ishlari bo‘limiga murojaat qiling. Kerakli hujjatlar: pasport, attestat, 3x4 fotosurat (6 dona), tarjimai hol va ota-onadan rozilik xati.</p>
+                    <img src="{% static 'images/ariza1.png' %}" alt="Ariza topshirish jarayoni">
+                </div>
+            </div>
+
+            <div class="timeline-item right">
+                <div class="timeline-icon"><i class="bi bi-heart-pulse-fill"></i></div>
+                <div class="timeline-content">
+                    <h3>2. Dastlabki tanlov</h3>
+                    <p>Tibbiy ko‘rik (harbiy-tibbiy komissiya), psixologik testlar va jismoniy tayyorgarlik normativlari (yugurish, tortilish, push-up).</p>
+                    <img src="{% static 'images/medical.jpg' %}" alt="Tibbiy ko'rik">
+                </div>
+            </div>
+
+            <div class="timeline-item left">
+                <div class="timeline-icon"><i class="bi bi-pencil-square"></i></div>
+                <div class="timeline-content">
+                    <h3>3. Test sinovlari</h3>
+                    <p>Iyul oyida Davlat test markazi (DTM) orqali: Matematika, Fizika, O‘zbek tili (yoki Rus tili). O‘tish ballari har yili o‘zgaradi.</p>
+                    <img src="{% static 'images/test3.png' %}" alt="Test sinovi">
+                </div>
+            </div>
+
+            <div class="timeline-item right">
+                <div class="timeline-icon"><i class="bi bi-trophy-fill"></i></div>
+                <div class="timeline-content">
+                    <h3>4. Yakuniy qabul</h3>
+                    <p>Natijalar e’lon qilinadi. O‘qish muddati 5 yil, to‘liq davlat ta’minoti (stipendiya, ovqat, kiyim-kechak, yotoqxona).</p>
+                    <img src="{% static 'images/elon.jpg' %}" alt="Qabul marosimi">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Imtiyozlar -->
+<section class="imtiyoz-section">
+    <div class="container">
+        <h2 class="text-5xl font-bold text-center mb-20 text-blue-800">Imtiyozlar</h2>
+        <div class="accordion max-w-5xl mx-auto">
+            <div class="accordion-item">
+                <div class="accordion-header">Muddatli harbiy xizmat o‘taganlar <i class="bi bi-chevron-down"></i></div>
+                <div class="accordion-body">Test ballariga 50% qo‘shimcha ball + tavsiyanoma bilan ustunlik.</div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header">“Temurbeklar maktabi” bitiruvchilari <i class="bi bi-chevron-down"></i></div>
+                <div class="accordion-body">Test ballariga 30% qo‘shimcha ball.</div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header">Harbiy xizmatchilar farzandlari <i class="bi bi-chevron-down"></i></div>
+                <div class="accordion-body">Qo‘shimcha kvota (5%) va imtiyozlar.</div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header">Olimpiada va musobaqa g‘oliblari <i class="bi bi-chevron-down"></i></div>
+                <div class="accordion-body">Testsinovsiz qabul imkoniyati.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Kontakt -->
+<section class="contact-section">
+    <div class="container">
+        <h2 class="text-5xl font-bold text-center mb-20 text-blue-800">Bog‘lanish</h2>
+        <div class="contact-card">
+            <div class="contact-item">
+                <i class="bi bi-geo-alt-fill"></i>
+                <div>
+                    <strong>Manzil:</strong><br>
+                    Qarshi shahri, Harbiy Aviatsiya Instituti
+                </div>
+            </div>
+            <div class="contact-item">
+                <i class="bi bi-telephone-fill"></i>
+                <div>
+                    <strong>Telefon:</strong><br>
+                    +998 (75) 225-XX-XX (aniq raqam uchun mudofaa bo‘limiga murojaat qiling)
+                </div>
+            </div>
+            <div class="contact-item">
+                <i class="bi bi-envelope-fill"></i>
+                <div>
+                    <strong>Email:</strong><br>
+                    info@airforce.uz
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Timeline scroll animation
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.2 });
+
+    timelineItems.forEach(item => observer.observe(item));
+
+    // Accordion toggle
+    document.querySelectorAll('.accordion-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const body = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            body.classList.toggle('open');
+            icon.classList.toggle('bi-chevron-down');
+            icon.classList.toggle('bi-chevron-up');
+            header.classList.toggle('active');
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if object %}Maqolani tahrirlash{% else %}Yangi maqola yozish{% endif %} • EDVora
+{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="form-wrapper">
+
+        <!-- Orqaga tugmasi — har doim tepada -->
+        <a href="{% url 'blogs:post_list' %}" class="btn btn-outline-dark back-btn shadow-lg">
+            Orqaga
+        </a>
+
+        <div class="card border-0 shadow-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="card-header-custom">
+                <h1 class="display-5 fw-bold mb-3">
+                    *Yangi blog yaratish*
+                </h1>
+                <p class="lead opacity-90 mb-0">
+                    **Ijodingizni dunyo bilan baham ko‘ring!**
+                </p>
+            </div>
+
+            <div class="card-body p-5 p-lg-6">
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    {{ form.media }}
+
+                    <!-- Sarlavha -->
+                    <div class="mb-5">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">
+                            <strong>*Sarlavha</strong>
+                        </label>
+                        {{ form.title }}
+                        <div class="help-block">
+                            Qiziqarli va aniq sarlavha yozing (10–100 belgi tavsiya etiladi)
+                        </div>
+                        {% if form.title.errors %}
+                            <div class="text-danger mt-2 fw-bold">
+                                {% for error in form.title.errors %}{{ error }}<br>{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Asosiy rasm -->
+                    <div class="mb-5">
+                        <label for="{{ form.main_image.id_for_label }}" class="form-label">
+                            <strong>*Asosiy rasm (muqova uchun)</strong>
+                        </label>
+                        {{ form.main_image }}
+                        <div class="help-block">
+                            Yuqori sifatli rasm yuklang • Tavsiya: 1200×675px • Maksimal 5MB
+                        </div>
+                        {% if form.main_image.errors %}
+                            <div class="text-danger mt-2 fw-bold">
+                                {% for error in form.main_image.errors %}{{ error }}<br>{% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Joriy rasm (tahrirlashda) -->
+                        {% if object and object.main_image %}
+                        <div class="mt-4">
+                            <p class="current-image-label">
+                                Joriy muqova rasmi:
+                            </p>
+                            <img src="{{ object.main_image.url }}" class="image-preview" alt="Joriy rasm">
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Matn (CKEditor) -->
+                    <div class="mb-5">
+                        <label class="form-label">
+                            <strong>*To'liq matn</strong>
+                        </label>
+                        <p class="help-block mb-3">
+                            Rasm, video, jadval, kod, ro‘yxat — hamma narsani qo‘shishingiz mumkin!
+                        </p>
+                        {{ form.body }}
+                        {% if form.body.errors %}
+                            <div class="text-danger mt-2 fw-bold">
+                                {% for error in form.body.errors %}{{ error }}<br>{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Kategoriya va Teglar -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-lg-6">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">
+                                Kategoriya
+                            </label>
+                            {{ form.category }}
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="{{ form.tags.id_for_label }}" class="form-label">
+                                Teglar
+                            </label>
+                            {{ form.tags }}
+                            <div class="help-block">
+                                Ctrl (Cmd) bosib bir nechta tanlang
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nashr sozlamalari -->
+                    <div class="row mb-5">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                {{ form.is_published }}
+                                <label class="form-check-label fw-bold text-success" for="{{ form.is_published.id_for_label }}">
+                                    Darhol nashr qilish
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                {{ form.is_featured }}
+                                <label class="form-check-label fw-bold text-warning" for="{{ form.is_featured.id_for_label }}">
+                                    Tanlangan maqola (bosh sahifada chiqadi)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tugmalar -->
+                    <div class="text-center pt-4 border-top">
+                        <button type="submit" class="btn btn-success btn-action shadow-lg">
+                            {% if object %}
+                                Yangilash
+                            {% else %}
+                                Nashr qilish
+                            {% endif %}
+                        </button>
+                        <a href="{% url 'blogs:post_list' %}" class="btn btn-outline-danger btn-action ms-4">
+                            Bekor qilish
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,509 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bosh sahifa{% endblock %}</title>
+
+    <style>
+        @view-transition {
+            navigation: auto;
+        }
+    </style>
+
+    <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+    <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+    <script src="{% static 'js/tailwind.js' %}" type="text/javascript"></script>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'icons/font/bootstrap-icons.css' %}">
+    <link rel="icon" href="{% static 'logo/inst.png' %}">
+
+    <style>
+        /* Umumiy sozlamalar */
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Aviatsiya background pattern – rasmsiz, nozik */
+        .aviatsiya-pattern-bg {
+            background-color: #f8fbff;
+            background-image: 
+                radial-gradient(circle at 15% 25%, transparent 8px, rgba(33, 150, 243, 0.06) 8px, rgba(33, 150, 243, 0.06) 9px, transparent 9px),
+                radial-gradient(circle at 85% 75%, transparent 10px, rgba(33, 150, 243, 0.06) 10px, rgba(33, 150, 243, 0.06) 11px, transparent 11px),
+                radial-gradient(circle at 50% 15%, transparent 12px, rgba(33, 150, 243, 0.05) 12px, rgba(33, 150, 243, 0.05) 13px, transparent 13px),
+                radial-gradient(circle at 35% 85%, transparent 11px, rgba(33, 150, 243, 0.05) 11px, rgba(33, 150, 243, 0.05) 12px, transparent 12px),
+                linear-gradient(30deg, transparent 45%, rgba(33, 150, 243, 0.03) 46%, rgba(33, 150, 243, 0.03) 54%, transparent 55%),
+                linear-gradient(-30deg, transparent 45%, rgba(33, 150, 243, 0.03) 46%, rgba(33, 150, 243, 0.03) 54%, transparent 55%);
+            background-size: 100px 100px, 120px 120px, 140px 140px, 160px 160px, 70px 70px, 90px 90px;
+            background-repeat: repeat;
+            position: relative;
+        }
+
+        .aviatsiya-pattern-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(33, 150, 243, 0.02) 4deg, transparent 8deg);
+            background-size: 50px 50px;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        /* Header */
+        .main-header {
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #e3f2fd;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0px 55px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            height: 80px;
+        }
+
+        /* LOGO */
+        .logo-section a {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            width: 60px;
+            height: 75px;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-size: 25px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #64b5f6 0%, #2196f3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
+            margin: 0;
+        }
+
+        /* Navigation */
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-menu.collapsed {
+            display: none;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            color: #666;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: #2196f3;
+            background: #e3f2fd;
+            border-color: #bbdefb;
+        }
+
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 2px;
+            background: linear-gradient(90deg, #2196f3, #64b5f6);
+            border-radius: 2px;
+        }
+
+        .nav-link.active {
+            color: #2196f3;
+            background: #e3f2fd;
+            border-color: #bbdefb;
+        }
+
+        .nav-link i {
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover i {
+            transform: rotate(20deg) scale(1.15);
+        }
+
+        /* Tooltip */
+        .nav-link::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -36px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            padding: 6px 12px;
+            background: rgba(0, 0, 0, 0.85);
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 1002;
+        }
+
+        .nav-link:hover::before {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* Footer – har doim pastda */
+        .main-footer {
+            background: #f5faff;
+            border-top: 1px solid #bbdefb;
+            padding: 20px;
+            text-align: center;
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .footer-text {
+            font-size: 12px;
+            color: #999;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .footer-text strong {
+            color: #2196f3;
+            font-weight: 600;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Preloader – logo + spinner + foiz */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease;
+        }
+
+        #preloader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #preloader-logo {
+            width: 120px;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 40px;
+        }
+
+        .spinner-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+
+        .spinner {
+            width: 100px;
+            height: 100px;
+            border: 8px solid #e3f2fd;
+            border-top: 8px solid #2196f3;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: #2196f3;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 992px) {
+            .header-container {
+                padding: 0 20px;
+            }
+
+            .logo-text {
+                display: none;
+            }
+
+            .nav-menu {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                right: 0;
+                background: #ffffff;
+                flex-direction: column;
+                gap: 0;
+                padding: 12px 20px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                max-height: calc(100vh - 80px);
+                overflow-y: auto;
+                border-top: 1px solid #e3f2fd;
+            }
+
+            .nav-menu.collapsed {
+                display: none;
+            }
+
+            .nav-menu:not(.collapsed) {
+                display: flex;
+            }
+
+            .nav-link {
+                width: 100%;
+                justify-content: flex-start;
+                height: 48px;
+                gap: 12px;
+                padding: 0 12px;
+            }
+
+            .nav-link i {
+                font-size: 22px;
+            }
+
+            .nav-link::before {
+                content: attr(data-tooltip);
+                position: static;
+                transform: none;
+                padding: 0;
+                background: transparent;
+                color: #666;
+                font-size: 15px;
+                font-weight: 500;
+                opacity: 1;
+            }
+
+            .nav-link:hover::before {
+                color: #2196f3;
+            }
+
+            .nav-link:hover::after {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+        }
+
+        @media (min-width: 993px) {
+            .menu-toggle {
+                display: none;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="aviatsiya-pattern-bg">
+
+    <!-- Preloader – logo + spinner + foiz -->
+    <div id="preloader">
+        <img src="{% static 'logo/inst.png' %}" alt="Institut logosi" id="preloader-logo">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <div class="progress-text" id="progress-text">0%</div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="main-header" aria-label="Asosiy navigatsiya">
+        <div class="header-container">
+            <div class="logo-section">
+                <a href="{% url 'blogs:post_list' %}">
+                    <img src="{% static 'logo/inst.png' %}" alt="Institut logosi" class="logo-img">
+                    <h1 class="logo-text">HARBIY AVIATSIYA INSTITUTI</h1>
+                </a>
+            </div>
+            <nav>
+                <ul class="nav-menu" id="navMenu">
+                    <li class="nav-item"><a href="{% url 'blogs:post_list' %}" class="nav-link" data-tooltip="Bloglar" aria-label="Bloglar"><i class="bi bi-newspaper"></i></a></li>
+                    <li class="nav-item"><a href="{% url 'leadership' %}" class="nav-link" data-tooltip="Rahbariyat" aria-label="Rahbariyat"><i class="bi bi-people-fill"></i></a></li>
+                    <li class="nav-item"><a href="{% url 'students' %}" class="nav-link" data-tooltip="Abuturentlar uchun" aria-label="Abuturentlar uchun"><i class="bi bi-people"></i></a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-tooltip="Moddiy bazamiz" aria-label="Moddiy bazamiz"><i class="bi bi-columns-gap fs-5"></i></a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-tooltip="Kutubxona" aria-label="Kutubxona"><i class="bi bi-book"></i></a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-tooltip="Bo‘sh ish o‘rinlari" aria-label="Bo‘sh ish o‘rinlari"><i class="bi bi-file-earmark-text"></i></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="main-footer py-8 bg-white border-top border-blue-100">
+        <div class="container max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                
+                <!-- Copyright -->
+                <div class="flex flex-col items-center md:items-start">
+                    <p class="footer-text text-gray-700 text-sm leading-relaxed mb-4">
+                        © <span id="current-year"></span> <strong class="text-blue-600">Samirbek Jabborov</strong><br>
+                        Barcha huquqlar himoyalangan
+                    </p>
+                </div>
+
+                <!-- Ijtimoiy tarmoqlar -->
+                <div class="flex flex-col items-center">
+                    <p class="text-gray-600 font-semibold mb-4">Bizni kuzatib boring</p>
+                    <div class="flex gap-6">
+                        <a href="https://t.me/uzaviators/" target="_blank" class="text-blue-500 hover:text-blue-700 transition-colors" aria-label="Telegram">
+                            <i class="bi bi-telegram text-3xl"></i>
+                        </a>
+                        <a href="https://www.youtube.com/@UzArmiya/" target="_blank" class="text-red-600 hover:text-red-700 transition-colors" aria-label="YouTube">
+                            <i class="bi bi-youtube text-3xl"></i>
+                        </a>
+                        <a href="https://www.instagram.com/aviation_institute_uzbekistan/" target="_blank" class="text-red-600 hover:text-red-700 transition-colors" aria-label="instagram">
+                            <i class="bi bi-instagram text-3xl"></i>
+                        </a>
+                        <a href="https://www.facebook.com/mudofaavazirligi" target="_blank" class="text-blue-500 hover:text-blue-700 transition-colors" aria-label="facebook">
+                            <i class="bi bi-facebook text-3xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Joylashuv -->
+                <div class="flex flex-col items-center md:items-end">
+                    <p class="text-gray-600 font-semibold mb-4">Manzilimiz</p>
+                    <p class="text-sm text-gray-700 max-w-xs leading-relaxed">
+                        O‘zbekiston Respublikasi,<br>
+                        Qashqadaryo viloyati, Qarshi shahar,<br>
+                        Jayhun ko‘chasi, 54-uy
+                    </p>
+                    <a href="https://www.google.com/maps/place/O'zbekiston+Respublikasi+Harbiy+aviatsiya+instituti/@38.8567744,65.8142283,798m/data=!3m1!1e3!4m6!3m5!1s0x3f4ea7bdb2e74c75:0x6dc480b09e155545!8m2!3d38.8567703!4d65.8168086!16s%2Fg%2F11rfswh5lw?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="mt-3 inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors text-sm font-medium">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        Xaritada ko‘rish
+                    </a>
+                </div>
+            </div>
+
+            <!-- Pastki qism – nozik chiziq bilan -->
+            <div class="mt-8 pt-6 border-t border-gray-200 text-center">
+                <p class="text-xs text-gray-500">
+                    Harbiy Aviatsiya Instituti rasmiy veb-sayti • 2025
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        // Active link highlight
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') === currentPath || (currentPath === '/' && link.getAttribute('href') === '/')) {
+                link.classList.add('active');
+            }
+        });
+
+        // Footer yili avto-yangilanish
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Preloader – logo + spinner + foiz
+        window.addEventListener('load', function() {
+            const preloader = document.getElementById('preloader');
+            const progressText = document.getElementById('progress-text');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 12) + 8;
+                if (progress > 100) progress = 100;
+                progressText.textContent = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        preloader.classList.add('hidden');
+                        setTimeout(() => {
+                            preloader.remove();
+                        }, 800);
+                    }, 400);
+                }
+            }, 120);
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+
+    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'9aac061e41f01961',t:'MTc2NTE5NDQwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+</body>
+
+</html>

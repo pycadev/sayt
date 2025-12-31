@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}HARBIY AVIATSIYA INSTITUTI{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== FULL SCREEN VIDEO ===== */
+    .full-screen-video {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        z-index: -1;
+    }
+    .full-screen-video video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* ===== OVERLAY CONTENT ===== */
+    .content-overlay {
+        position: relative;
+        z-index: 10;
+        min-height: 100vh;
+        color: white;
+    }
+
+    /* ===== HERO ===== */
+    .hero-text {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 2rem;
+        background: rgba(0,0,0,0.3);
+    }
+    .hero-text h1 {
+        font-size: 4.5rem;
+        font-weight: 900;
+        color: #fff;
+        text-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    }
+    .hero-text p {
+        font-size: 2rem;
+        max-width: 1200px;
+        color: #fff;
+        text-shadow: 0 6px 30px rgba(0,0,0,0.7);
+        font-weight: 500;
+    }
+
+    /* ===== TOGGLE BUTTONS OSTMA-OST ===== */
+    .top-right-toggles {
+        position: fixed;
+        top: 80px;
+        right: 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        z-index: 1100;
+    }
+    .top-right-toggles i {
+        font-size: 2rem;
+        cursor: pointer;
+        color: white;
+        text-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        transition: transform 0.3s ease;
+    }
+    .top-right-toggles i:hover {
+        transform: scale(1.2);
+    }
+
+    /* ===== POSTS ===== */
+    .posts-section {
+        position: relative;
+        z-index: 20;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(15px);
+        padding: 120px 0 60px 0;
+        color: #000;
+        margin-top: -50px;
+    }
+    .post-card {
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        transition: 0.4s;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+    }
+    .post-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    }
+
+    /* ===== IMAGE ===== */
+    .post-img-wrapper {
+        height: 350px;
+        overflow: hidden;
+    }
+    .post-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s;
+    }
+    .post-card:hover .post-img {
+        transform: scale(1.1);
+    }
+
+    /* ===== TEXT ===== */
+    .post-card h5 {
+        font-size: 1.2rem;
+        color: #111;
+        margin-bottom: 0.5rem;
+    }
+    .post-card p {
+        font-size: 0.95rem;
+        color: #555;
+        margin-bottom: 1rem;
+    }
+
+    /* ===== META ===== */
+    .author-avatar {
+        width: 40px;
+        height: 50px;
+        border-radius: 0; /* Dumaloq bo'lmasin */
+    }
+    .post-meta {
+        font-size: 0.85rem;
+        color: #777;
+    }
+
+    /* ===== CREATE BUTTON ===== */
+    .create-btn {
+        position: fixed;
+        top: 150px;
+        right: 40px;
+        z-index: 1050;
+        border-radius: 50px;
+        padding: 16px 36px;
+        font-weight: 700;
+        font-size: 17px;
+        background: linear-gradient(135deg, #28a745, #20c997);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ===== VIDEO ===== -->
+<div class="full-screen-video">
+    <video id="bg-video" autoplay loop muted playsinline
+           disablePictureInPicture disableRemotePlayback
+           controlsList="nodownload" oncontextmenu="return false;">
+        <source src="{% static 'main.mp4' %}" type="video/mp4">
+    </video>
+</div>
+
+<!-- ===== TOGGLES ===== -->
+<div class="top-right-toggles">
+    <i class="bi bi-eye eye-toggle" id="eye-toggle" title="Matnni yashirish/ko'rsatish"></i>
+    <i class="bi bi-volume-mute-fill" id="sound-toggle" title="Video ovozini yoqish/o‘chirish"></i>
+</div>
+
+<!-- ===== HERO ===== -->
+<div class="content-overlay">
+    <div class="hero-text">
+        <h1 id="hero-title">
+            O‘ZBEKISTON RESPUBLIKASI HARBIY XAVFSIZLIK VA MUDOFAA UNIVERSITETI
+            HARBIY AVIATSIYA INSTITUTI
+        </h1>
+        <p id="hero-text">(vatan qudratini qanotlarimizda ko‘taramiz)</p>
+    </div>
+
+    <!-- ===== POSTS ===== -->
+    <section class="posts-section">
+        <div class="container" id="posts-container">
+
+            {% if user.is_authenticated %}
+            <a href="{% url 'blogs:post_create' %}" class="btn btn-success create-btn">
+                + Yangi maqola
+            </a>
+            {% endif %}
+
+            <div class="row g-5" id="posts-row">
+                {% for post in page_obj %}
+                <div class="col-md-6 col-lg-4 post-item">
+                    <a href="{% url 'blogs:post_detail' post.pk %}" class="text-decoration-none">
+                        <div class="post-card h-100">
+                            <!-- IMAGE -->
+                            {% if post.main_image %}
+                                <div class="post-img-wrapper">
+                                    <img src="{{ post.main_image.url }}" class="post-img w-200">
+                                </div>
+                            {% else %}
+                                <div class="post-img-wrapper bg-light d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-image fs-1 text-muted"></i>
+                                </div>
+                            {% endif %}
+                            <div class="p-4 d-flex flex-column justify-content-between h-70">
+                                <div>
+                                    <h5>{{ post.title|truncatechars:50 }}</h5>
+                                </div>
+
+                                <!-- META -->
+                                <div class="d-flex align-items-center justify-content-between mt-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="{% static 'logo/inst.png' %}" class="author-avatar">
+                                        <div class="post-meta">
+                                            <strong>{{ post.author.username }}</strong><br>
+                                            <small>{{ post.published_at|date:"d M Y" }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="post-meta d-flex align-items-center gap-1">
+                                        <i class="bi bi-eye"></i> {{ post.views }}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if page_obj.has_next %}
+            <div class="text-center mt-5">
+                <button class="btn btn-primary" id="load-more-btn" data-next-page="{{ page_obj.next_page_number }}">Keyingi</button>
+            </div>
+            {% endif %}
+
+        </div>
+    </section>
+</div>
+
+<!-- ===== JS ===== -->
+<script>
+    const video = document.getElementById('bg-video');
+    const soundToggle = document.getElementById('sound-toggle');
+    const eyeToggle = document.getElementById('eye-toggle');
+    const heroTitle = document.getElementById('hero-title');
+    const heroText = document.getElementById('hero-text');
+
+    // Ovoz toggle
+    soundToggle.addEventListener('click', () => {
+        if (video.muted) {
+            video.muted = false;
+            soundToggle.classList.remove('bi-volume-mute-fill');
+            soundToggle.classList.add('bi-volume-up-fill');
+        } else {
+            video.muted = true;
+            soundToggle.classList.remove('bi-volume-up-fill');
+            soundToggle.classList.add('bi-volume-mute-fill');
+        }
+    });
+
+    // Eye toggle
+    eyeToggle.addEventListener('click', () => {
+        const hidden = heroTitle.style.display === 'none';
+        heroTitle.style.display = hidden ? 'block' : 'none';
+        heroText.style.display = hidden ? 'block' : 'none';
+        eyeToggle.className = hidden ? 'bi bi-eye eye-toggle' : 'bi bi-eye-slash eye-toggle';
+    });
+
+    // ===== AJAX LOAD MORE =====
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if(loadMoreBtn){
+        loadMoreBtn.addEventListener('click', function(){
+            const nextPage = this.dataset.nextPage;
+            fetch(`?page=${nextPage}`, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+            .then(response => response.text())
+            .then(data => {
+                const parser = new DOMParser();
+                const htmlDoc = parser.parseFromString(data, 'text/html');
+                const newPosts = htmlDoc.querySelectorAll('.post-item');
+                newPosts.forEach(p => document.getElementById('posts-row').appendChild(p));
+
+                // Update next page
+                const newBtn = htmlDoc.getElementById('load-more-btn');
+                if(newBtn){
+                    this.dataset.nextPage = newBtn.dataset.nextPage;
+                } else {
+                    this.remove(); // remove button if no more pages
+                }
+            })
+            .catch(err => console.log(err));
+        });
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }} • EDVora{% endblock %}
+
+{% block extra_css %}
+<style>
+    .article-header {
+        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url({{ post.main_image.url|default:'' }}) center/cover no-repeat;
+        color: white;
+        border-radius: 20px;
+        padding: 100px 20px;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+    .article-body {
+        font-size: 1.15rem;
+        line-height: 1.85;
+        color: #2d2d2d;
+    }
+    .article-body img {
+        max-width: 100%;
+        border-radius: 12px;
+        margin: 25px 0;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    .like-btn {
+        transition: all 0.2s;
+        font-size: 1.4rem;
+        padding: 12px 32px;
+        border-radius: 50px;
+        cursor: pointer;
+    }
+    .like-btn.liked {
+        background: #e74c3c !important;
+        color: white !important;
+    }
+    .comment-item {
+        background: #f8f9fa;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-left: 4px solid #007bff;
+    }
+    .comment-avatar {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border: 3px solid white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- Article Header -->
+    <div class="article-header">
+        {% if post.category %}
+            <a href="{% url 'blogs:post_list' %}?category={{ post.category.slug }}" class="badge bg-light text-dark mb-3 fs-6">
+                {{ post.category.name }}
+            </a>
+        {% endif %}
+        <h1 class="display-4 fw-bold mb-4">{{ post.title }}</h1>
+        <div class="d-flex align-items-center justify-content-center gap-4 text-white-50">
+            <div class="d-flex align-items-center gap-3">
+                    <img src="{% static 'logo/inst.png' %}" width="50" alt="">
+                <div>
+                    <strong class="d-block">
+                        <a href="{% url 'blogs:author_posts' post.author.username %}" class="text-white text-decoration-none">
+                            {{ post.author.get_full_name }}
+                        </a>
+                    </strong>
+                    <small>{{ post.published_at|date:"d F Y, H:i" }}</small>
+                </div>
+            </div>
+            <div>
+                {{ post.views }} ko‘rish • {{ post.total_comments }} izoh
+            </div>
+        </div>
+    </div>
+
+    <!-- Article Content -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <article class="article-body">
+                {{ post.body|safe }}
+            </article>
+
+            <!-- Tags -->
+            {% if post.tags.exists %}
+            <div class="mt-5">
+                <strong>Teglar:</strong>
+                {% for tag in post.tags.all %}
+                    <a href="{% url 'blogs:post_list' %}?tag={{ tag.slug }}" class="badge bg-secondary text-white me-2 mb-2">
+                        #{{ tag.name }}
+                    </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <!-- Related Posts -->
+            {% if related_posts %}
+            <div class="mt-5 pt-5 border-top">
+                <h3 class="mb-4">O‘xshash maqolalar</h3>
+                <div class="row g-4">
+                    {% for rel in related_posts %}
+                    <div class="col-md-6 col-lg-4">
+                        <a href="{% url 'blogs:post_detail' rel.pk %}" class="text-decoration-none">
+                            <div class="card h-100 border-0 shadow-sm">
+                                {% if rel.main_image %}
+                                    <img src="{{ rel.main_image.url }}" class="card-img-top" style="height:180px; object-fit:cover;" alt="">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ rel.title|truncatechars:60 }}</h6>
+                                    <small class="text-muted">{{ rel.author.get_full_name }} • {{ rel.published_at|date:"d.m.Y" }}</small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const type = this.dataset.type;
+        const id = this.dataset.id;
+        const action = this.dataset.action;
+
+        fetch("{% url 'blogs:like_dislike' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: `content_type=${type}&object_id=${id}&action=${action}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.likes !== undefined) {
+                // Post like/dislike
+                document.querySelector(`[data-type="post"][data-action="like"]`).innerHTML = `Yoqdi (${data.likes})`;
+                document.querySelector(`[data-type="post"][data-action="dislike"]`).innerHTML = `Yoqmadi (${data.dislikes})`;
+
+                document.querySelectorAll(`[data-type="post"]`).forEach(b => b.classList.remove('liked'));
+                if (data.user_like === 1) document.querySelector(`[data-type="post"][data-action="like"]`).classList.add('liked');
+                if (data.user_like === -1) document.querySelector(`[data-type="post"][data-action="dislike"]`).classList.add('liked');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}
